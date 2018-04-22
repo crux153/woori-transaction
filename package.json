@@ -1,0 +1,13 @@
+{
+  "name": "woori-transaction",
+  "version": "0.1.0",
+  "description": "Query Woori Bank Transactions",
+  "author": "Crux <crux153@users.noreply.github.com>",
+  "dependencies": {
+    "node-resemble-js": "^0.2.0",
+    "png-crop": "0.0.2",
+    "stream-to-buffer": "^0.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {}
+}
