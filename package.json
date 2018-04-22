@@ -6,6 +6,7 @@
   "dependencies": {
     "node-resemble-js": "^0.2.0",
     "png-crop": "0.0.2",
+    "puppeteer": "^1.3.0",
     "stream-to-buffer": "^0.1.0"
   },
   "devDependencies": {},
