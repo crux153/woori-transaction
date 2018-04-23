@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+"use strict";
+
+const commander = require("commander");
+const chalk = require("chalk");
+const { table } = require("table");
+
+const pkg = require("../package.json");
+const transaction = require("../lib");
+
+commander.version(pkg.version, "-v --version")
+	.option("-a --account <value>", "bank account number")
+	.option("-p --password <value>", "bank account password")
+	.option("-b --birthday <value>", "birthday of registered user")
+	.option("-j --json", "output json")
+	.parse(process.argv);
+
+if (!commander.account || !commander.password || !commander.birthday) {
+	commander.help();
+}
+
+transaction(commander.account, commander.password, commander.birthday)
+.then(result => {
+	if (commander.json) {
+		return process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+	}
+
+	const numberWithCommas = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+	const formatNumber = (num, formatter) => num > 0 ? formatter(numberWithCommas(num)) : numberWithCommas(num);
+
+	const output = table([
+		["일시", "적용", "기재내용", "출금", "입금", "잔액", "취급점"].map(c => chalk.cyan(c)),
+		...result.transactions.map(({
+			timestamp, type, name,
+			withdrawal, deposit, balance, branch
+		}) => [
+			timestamp, type, name,
+			formatNumber(withdrawal, chalk.magenta),
+			formatNumber(deposit, chalk.green),
+			formatNumber(balance, chalk.blue),
+			branch
+		])
+	], {
+		columns: {
+			3: {
+				alignment: "right"
+			},
+			4: {
+				alignment: "right"
+			},
+			5: {
+				alignment: "right"
+			}
+		}
+	});
+
+	console.log(output);
+});

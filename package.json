@@ -1,13 +1,19 @@
 {
   "name": "woori-transaction",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Query Woori Bank Transactions",
   "author": "Crux <crux153@users.noreply.github.com>",
+  "bin": {
+    "woori-transaction": "./bin/woori-transaction"
+  },
   "dependencies": {
+    "chalk": "^2.4.0",
+    "commander": "^2.15.1",
     "node-resemble-js": "^0.2.0",
     "png-crop": "0.0.2",
     "puppeteer": "^1.3.0",
-    "stream-to-buffer": "^0.1.0"
+    "stream-to-buffer": "^0.1.0",
+    "table": "^4.0.3"
   },
   "devDependencies": {},
   "scripts": {}
