@@ -55,4 +55,7 @@ transaction(commander.account, commander.password, commander.birthday)
 	});
 
 	console.log(output);
+})
+.catch(e => {
+	console.error(e);
 });
