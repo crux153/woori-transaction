@@ -3,6 +3,7 @@
   "version": "0.2.3",
   "description": "Query Woori Bank Transactions",
   "author": "Crux <crux153@users.noreply.github.com>",
+  "main": "lib/index.js",
   "bin": {
     "woori-transaction": "./bin/woori-transaction"
   },
