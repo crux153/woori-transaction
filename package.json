@@ -1,6 +1,6 @@
 {
   "name": "woori-transaction",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Query Woori Bank Transactions",
   "author": "Crux <crux153@users.noreply.github.com>",
   "main": "lib/index.js",
