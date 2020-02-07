@@ -27,7 +27,6 @@ export interface Result {
   branch: string;
   balance: number;
   withdrawable: number;
-  pages: number;
   transactions: Transaction[];
 }
 
@@ -184,79 +183,50 @@ export default async function(
 
   await page.waitForNavigation();
 
-  // Render result
-  const results: Result[] = [];
+  const result = await page.evaluate(() => {
+    const convertNumber = (number: string) =>
+      parseInt(number.replace(/,/g, ""), 10) || 0;
 
-  let totalPages = 1;
-  for (let currentPage = 1; currentPage <= totalPages; currentPage++) {
-    const result = await page.evaluate(() => {
-      const convertNumber = (number: string) =>
-        parseInt(number.replace(/,/g, ""), 10) || 0;
+    const replaceFullWidth = (str: string) =>
+      str.replace(/[\uFF01-\uFF5E]/g, (char: string) =>
+        String.fromCharCode(char.charCodeAt(0) - 0xfee0)
+      );
 
-      const replaceFullWidth = (str: string) =>
-        str.replace(/[\uFF01-\uFF5E]/g, (char: string) =>
-          String.fromCharCode(char.charCodeAt(0) - 0xfee0)
-        );
+    const meta =
+      document.querySelector(".tbl-type tbody")?.querySelectorAll("tr td") ||
+      [];
 
-      const pages = document.querySelector(".paginate")?.children.length || 0;
+    const [name, account, balance, withdrawable, branch] = [
+      ...new Array(5)
+    ].map((_, index) => meta[index]?.textContent || "");
 
-      const meta =
-        document.querySelector(".tbl-type tbody")?.querySelectorAll("tr td") ||
-        [];
-      const [name, account, balance, withdrawable, branch] = [
-        ...new Array(5)
-      ].map((_, index) => meta[index]?.textContent || "");
-
-      const transactions: Transaction[] = Array.from(
-        document.querySelectorAll("table.tbl-type-1 tbody tr")
+    const transactions: Transaction[] = Array.from(
+      document.querySelectorAll("table.tbl-type-1 tbody tr")
+    )
+      .map(el =>
+        Array.from(el.children).map(el => el?.textContent?.trim() || "")
       )
-        .map(el =>
-          Array.from(el.children).map(el => el?.textContent?.trim() || "")
-        )
-        .filter(el => el.length === 7) // filter rows without data
-        .map(
-          ([timestamp, type, name, withdrawal, deposit, balance, branch]) => ({
-            timestamp,
-            type,
-            branch,
-            name: replaceFullWidth(name),
-            withdrawal: convertNumber(withdrawal),
-            deposit: convertNumber(deposit),
-            balance: convertNumber(balance)
-          })
-        );
-
-      return {
-        name,
-        account,
+      .filter(el => el.length === 7) // filter rows without data
+      .map(([timestamp, type, name, withdrawal, deposit, balance, branch]) => ({
+        timestamp,
+        type,
         branch,
-        transactions,
-        balance: convertNumber(balance.replace(" 원", "")),
-        withdrawable: convertNumber(withdrawable.replace(" 원", "")),
-        pages
-      };
-    });
+        name: replaceFullWidth(name),
+        withdrawal: convertNumber(withdrawal),
+        deposit: convertNumber(deposit),
+        balance: convertNumber(balance)
+      }));
 
-    totalPages = result.pages;
-    results.push(result);
-
-    // Move to next page
-    if (currentPage < totalPages) {
-      await page.evaluate(nextPage => {
-        (document as any).frm.NEXT_ROWS.value = String(nextPage);
-        window.doSubmit();
-      }, currentPage + 1);
-
-      await page.waitForNavigation();
-    }
-  }
+    return {
+      name,
+      account,
+      branch,
+      transactions,
+      balance: convertNumber(balance.replace(" 원", "")),
+      withdrawable: convertNumber(withdrawable.replace(" 원", ""))
+    };
+  });
 
   await browser.close();
-
-  return {
-    ...results[0],
-    transactions: ([] as Transaction[]).concat(
-      ...results.map(result => result.transactions)
-    )
-  };
+  return result;
 }
