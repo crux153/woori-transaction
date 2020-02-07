@@ -1,15 +1,47 @@
-"use strict";
+import puppeteer from "puppeteer";
+import keypad from "./keypad";
 
-const puppeteer = require("puppeteer");
-const keypad = require("./keypad");
-
-const URL = "https://spib.wooribank.com/spd/Dream?withyou=CMSPD0010";
+const WOORI_URL = "https://spib.wooribank.com/spd/Dream?withyou=CMSPD0010";
 
 class DialogError extends Error {}
 class PageError extends Error {}
 class RangeError extends Error {}
 
-function parseRange(range) {
+declare global {
+  interface Window {
+    setToday(): void;
+    setCalTerm(
+      isBefore: boolean,
+      baseId: string,
+      targetId: string,
+      unit: string,
+      value: string
+    ): void;
+    doSubmit(): void;
+  }
+}
+
+export interface Result {
+  name: string;
+  account: string;
+  branch: string;
+  balance: number;
+  withdrawable: number;
+  pages: number;
+  transactions: Transaction[];
+}
+
+export interface Transaction {
+  timestamp: string;
+  type: string;
+  branch: string;
+  name: string;
+  withdrawal: number;
+  deposit: number;
+  balance: number;
+}
+
+function parseRange(range: string) {
   const matches = range.match(/^([0-9]+)([DWM])$/);
   if (!matches) {
     throw new RangeError("Not valid range");
@@ -25,9 +57,14 @@ function parseRange(range) {
   return { amount, unit };
 }
 
-module.exports = async function(account, password, birthday, range = "1W") {
+export default async function(
+  account: string,
+  password: string,
+  birthday: string,
+  rangeStr: string = "1W"
+): Promise<Result> {
   // Parse range
-  range = parseRange(range);
+  const range = parseRange(rangeStr);
 
   // Launch puppeteer
   const browser = await puppeteer.launch();
@@ -41,18 +78,32 @@ module.exports = async function(account, password, birthday, range = "1W") {
   });
 
   // Go to page
-  await page.goto(URL);
+  await page.goto(WOORI_URL);
 
   const $account = await page.$("#pup01");
+  if (!$account) {
+    throw new Error("Failed to find account input element");
+  }
+
   await $account.type(account.replace(/-/g, ""));
 
   // Handle keypad
-  const handleKeypad = async (selector, key) => {
+  const handleKeypad = async (selector: string, key: string) => {
     const $el = await page.$("#" + selector);
+    if (!$el) {
+      throw new Error("Failed to find input element");
+    }
+
     await $el.focus();
 
     const hash = await page.evaluate(async selector => {
-      const $img = document.querySelector(`#Tk_${selector}_layout img`);
+      const $img = document.querySelector<HTMLImageElement>(
+        `#Tk_${selector}_layout img`
+      );
+
+      if (!$img) {
+        throw new Error("Failed to find keypad image");
+      }
 
       // Wait until image loads
       await new Promise(resolve => {
@@ -76,8 +127,16 @@ module.exports = async function(account, password, birthday, range = "1W") {
     }, selector);
 
     const $img = await page.$(`#Tk_${selector}_layout img`);
+    if (!$img) {
+      throw new Error("Failed to find keypad image");
+    }
+
     const coords = await keypad(hash, key);
     const box = await $img.boundingBox();
+
+    if (!box) {
+      throw new Error("Image bounding box not visible");
+    }
 
     for (const { x, y } of coords) {
       await page.mouse.click(box.x + x, box.y + y);
@@ -94,7 +153,7 @@ module.exports = async function(account, password, birthday, range = "1W") {
   await page.waitForNavigation();
 
   // Check error message on page
-  const error = await page.evaluate(() => {
+  const errorMessage = await page.evaluate(() => {
     const $error = document.querySelector(
       "#error-area-TopLayer .error-area .mb10"
     );
@@ -105,9 +164,9 @@ module.exports = async function(account, password, birthday, range = "1W") {
     }
   });
 
-  if (error !== null) {
+  if (errorMessage !== null) {
     browser.close();
-    throw new PageError(error);
+    throw new PageError(errorMessage);
   }
 
   // Set range
@@ -126,27 +185,34 @@ module.exports = async function(account, password, birthday, range = "1W") {
   await page.waitForNavigation();
 
   // Render result
-  const results = [];
+  const results: Result[] = [];
 
   let totalPages = 1;
   for (let currentPage = 1; currentPage <= totalPages; currentPage++) {
     const result = await page.evaluate(() => {
-      const convertNumber = number => Number(number.replace(/,/g, ""));
-      const replaceFullWidth = str =>
-        str.replace(/[\uFF01-\uFF5E]/g, ch =>
-          String.fromCharCode(ch.charCodeAt(0) - 0xfee0)
+      const convertNumber = (number: string) =>
+        parseInt(number.replace(/,/g, ""), 10) || 0;
+
+      const replaceFullWidth = (str: string) =>
+        str.replace(/[\uFF01-\uFF5E]/g, (char: string) =>
+          String.fromCharCode(char.charCodeAt(0) - 0xfee0)
         );
 
-      const pages = document.querySelector(".paginate").children.length;
+      const pages = document.querySelector(".paginate")?.children.length || 0;
 
-      const [name, account, balance, withdrawable, branch] = Array.from(
-        document.querySelector(".tbl-type tbody").querySelectorAll("tr td")
-      ).map(el => el.textContent);
+      const meta =
+        document.querySelector(".tbl-type tbody")?.querySelectorAll("tr td") ||
+        [];
+      const [name, account, balance, withdrawable, branch] = [
+        ...new Array(5)
+      ].map((_, index) => meta[index]?.textContent || "");
 
-      const transactions = Array.from(
+      const transactions: Transaction[] = Array.from(
         document.querySelectorAll("table.tbl-type-1 tbody tr")
       )
-        .map(el => Array.from(el.children).map(el => el.textContent.trim()))
+        .map(el =>
+          Array.from(el.children).map(el => el?.textContent?.trim() || "")
+        )
         .filter(el => el.length === 7) // filter rows without data
         .map(
           ([timestamp, type, name, withdrawal, deposit, balance, branch]) => ({
@@ -177,7 +243,7 @@ module.exports = async function(account, password, birthday, range = "1W") {
     // Move to next page
     if (currentPage < totalPages) {
       await page.evaluate(nextPage => {
-        document.frm.NEXT_ROWS.value = String(nextPage);
+        (document as any).frm.NEXT_ROWS.value = String(nextPage);
         window.doSubmit();
       }, currentPage + 1);
 
@@ -186,14 +252,11 @@ module.exports = async function(account, password, birthday, range = "1W") {
   }
 
   await browser.close();
-  return results.reduce(
-    (acc, value) => ({
-      ...acc,
-      ...value,
-      transactions: [...acc.transactions, ...value.transactions]
-    }),
-    {
-      transactions: []
-    }
-  );
-};
+
+  return {
+    ...results[0],
+    transactions: ([] as Transaction[]).concat(
+      ...results.map(result => result.transactions)
+    )
+  };
+}

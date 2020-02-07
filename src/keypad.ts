@@ -1,5 +1,3 @@
-"use strict";
-
 const coordinates = [
   { x: 180, y: 93 },
   { x: 227, y: 93 },
@@ -17,7 +15,7 @@ const coordinates = [
 
 const hashes = ["713ff4", "d064da", "74d4c4", "8747a0", "8b22c9", "c01fd0"];
 
-module.exports = async function keypad(hash, password) {
+export default async function keypad(hash: string, password: string) {
   if (!/^[0-9]+$/.test(password)) {
     throw new Error("Password should be digits");
   }
@@ -30,5 +28,6 @@ module.exports = async function keypad(hash, password) {
   const numbers = coordinates.filter(
     (_, index) => index !== match && index !== 11 - match
   );
-  return password.split("").map(char => numbers[char]);
-};
+
+  return password.split("").map((char: string) => numbers[parseInt(char, 10)]);
+}

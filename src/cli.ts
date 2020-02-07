@@ -1,15 +1,12 @@
 #!/usr/bin/env node
-"use strict";
 
-const commander = require("commander");
-const chalk = require("chalk");
-const { table } = require("table");
+import commander from "commander";
+import chalk from "chalk";
+import { table } from "table";
 
-const pkg = require("../package.json");
-const transaction = require("../lib");
+import transaction from ".";
 
 commander
-  .version(pkg.version, "-v --version")
   .option("-a --account <value>", "bank account number")
   .option("-p --password <value>", "bank account password")
   .option("-b --birthday <value>", "birthday of registered user")
@@ -21,20 +18,26 @@ if (!commander.account || !commander.password || !commander.birthday) {
   commander.help();
 }
 
-transaction(
-  commander.account,
-  commander.password,
-  commander.birthday,
-  commander.range
-)
-  .then(result => {
+main();
+
+async function main() {
+  try {
+    const result = await transaction(
+      commander.account,
+      commander.password,
+      commander.birthday,
+      commander.range
+    );
+
     if (commander.json) {
-      return process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+      process.stdout.write(JSON.stringify(result, null, 2) + "\n");
+      return;
     }
 
-    const numberWithCommas = num =>
+    const numberWithCommas = (num: number) =>
       num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    const formatNumber = (num, formatter) =>
+
+    const formatNumber = (num: number, formatter: chalk.Chalk) =>
       num > 0 ? formatter(numberWithCommas(num)) : numberWithCommas(num);
 
     const output = table(
@@ -70,7 +73,7 @@ transaction(
     );
 
     console.log(output);
-  })
-  .catch(e => {
-    console.error(e);
-  });
+  } catch (error) {
+    console.log(error);
+  }
+}

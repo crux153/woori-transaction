@@ -1,15 +1,15 @@
 {
   "name": "woori-transaction",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Query Woori Bank Transactions",
   "author": "Crux <crux153@users.noreply.github.com>",
-  "main": "lib/index.js",
-  "bin": {
-    "woori-transaction": "./bin/woori-transaction"
-  },
+  "bin": "dist/cli.js",
+  "main": "dist/index.js",
   "scripts": {
-    "lint": "eslint \"lib/**/*.js\" \"bin/**/*\"",
-    "prettier": "prettier --write \"lib/**/*.js\" \"bin/**/*\""
+    "build": "npm run clean && tsc",
+    "clean": "rimraf dist",
+    "lint": "eslint \"src/**/*.ts\"",
+    "prettier": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
     "chalk": "^3.0.0",
@@ -18,10 +18,17 @@
     "table": "^5.4.6"
   },
   "devDependencies": {
+    "@types/puppeteer": "^2.0.0",
+    "@types/table": "^4.0.7",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@typescript-eslint/parser": "^2.19.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
     "husky": "^4.2.1",
     "lint-staged": "^10.0.7",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "rimraf": "^3.0.1",
+    "typescript": "^3.7.5"
   },
   "husky": {
     "hooks": {
@@ -29,11 +36,7 @@
     }
   },
   "lint-staged": {
-    "*.js": [
-      "prettier --write",
-      "git add"
-    ],
-    "bin/**/*": [
+    "*.ts": [
       "prettier --write",
       "git add"
     ]
