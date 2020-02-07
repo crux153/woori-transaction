@@ -40,23 +40,7 @@ export interface Transaction {
   balance: number;
 }
 
-function parseRange(range: string) {
-  const matches = range.match(/^([0-9]+)([DWM])$/);
-  if (!matches) {
-    throw new RangeError("Not valid range");
-  }
-
-  const amount = Number(matches[1]);
-  const unit = matches[2];
-
-  if (!amount) {
-    throw new RangeError("Range should be more than 1D, 1W, or 1M");
-  }
-
-  return { amount, unit };
-}
-
-export default async function(
+export default async function woori(
   account: string,
   password: string,
   birthday: string,
@@ -86,64 +70,8 @@ export default async function(
 
   await $account.type(account.replace(/-/g, ""));
 
-  // Handle keypad
-  const handleKeypad = async (selector: string, key: string) => {
-    const $el = await page.$("#" + selector);
-    if (!$el) {
-      throw new Error("Failed to find input element");
-    }
-
-    await $el.focus();
-
-    const hash = await page.evaluate(async selector => {
-      const $img = document.querySelector<HTMLImageElement>(
-        `#Tk_${selector}_layout img`
-      );
-
-      if (!$img) {
-        throw new Error("Failed to find keypad image");
-      }
-
-      // Wait until image loads
-      await new Promise(resolve => {
-        $img.addEventListener("load", resolve);
-      });
-
-      const response = await fetch($img.src);
-      if (!response.ok) {
-        throw new Error("Could not fetch keypad image");
-      }
-
-      const data = await response.arrayBuffer();
-
-      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hash = hashArray
-        .map(byte => byte.toString(16).padStart(2, "0"))
-        .join("");
-
-      return hash.substring(0, 6);
-    }, selector);
-
-    const $img = await page.$(`#Tk_${selector}_layout img`);
-    if (!$img) {
-      throw new Error("Failed to find keypad image");
-    }
-
-    const coords = await keypad(hash, key);
-    const box = await $img.boundingBox();
-
-    if (!box) {
-      throw new Error("Image bounding box not visible");
-    }
-
-    for (const { x, y } of coords) {
-      await page.mouse.click(box.x + x, box.y + y);
-    }
-  };
-
-  await handleKeypad("pup02", password);
-  await handleKeypad("pup03", birthday);
+  await handleKeypad(page, "pup02", password);
+  await handleKeypad(page, "pup03", birthday);
 
   await page.evaluate(() => {
     window.doSubmit();
@@ -164,7 +92,7 @@ export default async function(
   });
 
   if (errorMessage !== null) {
-    browser.close();
+    await browser.close();
     throw new PageError(errorMessage);
   }
 
@@ -183,6 +111,88 @@ export default async function(
 
   await page.waitForNavigation();
 
+  const result = await fetchResult(page);
+
+  await browser.close();
+  return result;
+}
+
+function parseRange(range: string) {
+  const matches = range.match(/^([0-9]+)([DWM])$/);
+  if (!matches) {
+    throw new RangeError("Not valid range");
+  }
+
+  const amount = Number(matches[1]);
+  const unit = matches[2];
+
+  if (!amount) {
+    throw new RangeError("Range should be more than 1D, 1W, or 1M");
+  }
+
+  return { amount, unit };
+}
+
+async function handleKeypad(
+  page: puppeteer.Page,
+  selector: string,
+  key: string
+) {
+  const $el = await page.$("#" + selector);
+  if (!$el) {
+    throw new Error("Failed to find input element");
+  }
+
+  await $el.focus();
+
+  const hash = await page.evaluate(async selector => {
+    const $img = document.querySelector<HTMLImageElement>(
+      `#Tk_${selector}_layout img`
+    );
+
+    if (!$img) {
+      throw new Error("Failed to find keypad image");
+    }
+
+    // Wait until image loads
+    await new Promise(resolve => {
+      $img.addEventListener("load", resolve);
+    });
+
+    const response = await fetch($img.src);
+    if (!response.ok) {
+      throw new Error("Could not fetch keypad image");
+    }
+
+    const data = await response.arrayBuffer();
+
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hash = hashArray
+      .map(byte => byte.toString(16).padStart(2, "0"))
+      .join("");
+
+    return hash.substring(0, 6);
+  }, selector);
+
+  const $img = await page.$(`#Tk_${selector}_layout img`);
+  if (!$img) {
+    throw new Error("Failed to find keypad image");
+  }
+
+  const coords = await keypad(hash, key);
+  const box = await $img.boundingBox();
+
+  if (!box) {
+    throw new Error("Image bounding box not visible");
+  }
+
+  for (const { x, y } of coords) {
+    await page.mouse.click(box.x + x, box.y + y);
+  }
+}
+
+async function fetchResult(page: puppeteer.Page): Promise<Result> {
   const result = await page.evaluate(() => {
     const convertNumber = (number: string) =>
       parseInt(number.replace(/,/g, ""), 10) || 0;
@@ -227,6 +237,5 @@ export default async function(
     };
   });
 
-  await browser.close();
   return result;
 }
