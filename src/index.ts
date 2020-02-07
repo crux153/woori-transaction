@@ -7,20 +7,6 @@ class DialogError extends Error {}
 class PageError extends Error {}
 class RangeError extends Error {}
 
-declare global {
-  interface Window {
-    setToday(): void;
-    setCalTerm(
-      isBefore: boolean,
-      baseId: string,
-      targetId: string,
-      unit: string,
-      value: string
-    ): void;
-    doSubmit(): void;
-  }
-}
-
 export interface Result {
   name: string;
   account: string;

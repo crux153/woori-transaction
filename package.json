@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "Query Woori Bank Transactions",
   "author": "Crux <crux153@users.noreply.github.com>",
-  "bin": "dist/cli.js",
-  "main": "dist/index.js",
+  "bin": "lib/cli.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "build": "npm run clean && tsc",
-    "clean": "rimraf dist",
+    "build": "npm run --silent clean && tsc",
+    "clean": "rimraf lib",
     "lint": "eslint \"src/**/*.ts\"",
     "prettier": "prettier --write \"src/**/*.ts\""
   },
