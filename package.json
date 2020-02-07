@@ -7,6 +7,10 @@
   "bin": {
     "woori-transaction": "./bin/woori-transaction"
   },
+  "scripts": {
+    "lint": "eslint \"lib/**/*.js\" \"bin/**/*\"",
+    "prettier": "prettier --write \"lib/**/*.js\" \"bin/**/*\""
+  },
   "dependencies": {
     "chalk": "^2.4.2",
     "commander": "^2.19.0",
@@ -16,6 +20,25 @@
     "stream-to-buffer": "^0.1.0",
     "table": "^5.2.3"
   },
-  "devDependencies": {},
-  "scripts": {}
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "husky": "^4.2.1",
+    "lint-staged": "^10.0.7",
+    "prettier": "^1.19.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write",
+      "git add"
+    ],
+    "bin/**/*": [
+      "prettier --write",
+      "git add"
+    ]
+  }
 }
