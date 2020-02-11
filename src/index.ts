@@ -41,8 +41,12 @@ export default async function woori(
 
   page.on("dialog", dialog => {
     const message = dialog.message();
-    browser.close();
 
+    if (message.includes("보안로그 수집기")) {
+      return dialog.dismiss();
+    }
+
+    browser.close();
     throw new DialogError(message);
   });
 
