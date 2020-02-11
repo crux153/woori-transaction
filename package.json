@@ -1,7 +1,25 @@
 {
   "name": "woori-transaction",
   "version": "1.0.0",
-  "description": "Query Woori Bank Transactions",
+  "description": "Inquiry Woori Bank transactions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crux153/woori-transaction.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=8"
+  },
+  "files": [
+    "lib"
+  ],
+  "keywords": [
+    "woori",
+    "bank"
+  ],
+  "bugs": {
+    "url": "https://github.com/crux153/woori-transaction/issues"
+  },
   "author": "Crux <crux153@users.noreply.github.com>",
   "bin": "lib/cli.js",
   "main": "lib/index.js",
