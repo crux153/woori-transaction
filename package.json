@@ -1,6 +1,6 @@
 {
   "name": "woori-transaction",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Inquiry Woori Bank transactions",
   "repository": {
     "type": "git",
@@ -31,23 +31,23 @@
     "prettier": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
-    "chalk": "^3.0.0",
-    "commander": "^4.1.1",
+    "chalk": "^4.0.0",
+    "commander": "^5.0.0",
     "puppeteer": "^2.1.1",
     "table": "^5.4.6"
   },
   "devDependencies": {
-    "@types/puppeteer": "^2.0.0",
-    "@types/table": "^4.0.7",
-    "@typescript-eslint/eslint-plugin": "^2.19.0",
-    "@typescript-eslint/parser": "^2.19.0",
+    "@types/puppeteer": "^2.0.1",
+    "@types/table": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
     "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.10.0",
-    "husky": "^4.2.1",
-    "lint-staged": "^10.0.7",
-    "prettier": "^1.19.1",
-    "rimraf": "^3.0.1",
-    "typescript": "^3.7.5"
+    "eslint-config-prettier": "^6.10.1",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.1.1",
+    "prettier": "^2.0.2",
+    "rimraf": "^3.0.2",
+    "typescript": "^3.8.3"
   },
   "husky": {
     "hooks": {
