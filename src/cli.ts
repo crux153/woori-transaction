@@ -42,9 +42,15 @@ async function main() {
 
     const output = table(
       [
-        ["일시", "적용", "기재내용", "출금", "입금", "잔액", "취급점"].map(c =>
-          chalk.cyan(c)
-        ),
+        [
+          "일시",
+          "적용",
+          "기재내용",
+          "출금",
+          "입금",
+          "잔액",
+          "취급점",
+        ].map((c) => chalk.cyan(c)),
         ...result.transactions.map(
           ({ timestamp, type, name, withdrawal, deposit, balance, branch }) => [
             timestamp,
@@ -53,22 +59,22 @@ async function main() {
             formatNumber(withdrawal, chalk.magenta),
             formatNumber(deposit, chalk.green),
             formatNumber(balance, chalk.blue),
-            branch
+            branch,
           ]
-        )
+        ),
       ],
       {
         columns: {
           3: {
-            alignment: "right"
+            alignment: "right",
           },
           4: {
-            alignment: "right"
+            alignment: "right",
           },
           5: {
-            alignment: "right"
-          }
-        }
+            alignment: "right",
+          },
+        },
       }
     );
 

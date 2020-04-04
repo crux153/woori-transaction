@@ -39,7 +39,7 @@ export default async function woori(
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  page.on("dialog", dialog => {
+  page.on("dialog", (dialog) => {
     const message = dialog.message();
 
     if (message.includes("보안로그 수집기")) {
@@ -87,7 +87,7 @@ export default async function woori(
   }
 
   // Set range
-  await page.evaluate(range => {
+  await page.evaluate((range) => {
     window.setToday();
     window.setCalTerm(
       true,
@@ -135,7 +135,7 @@ async function handleKeypad(
 
   await $el.focus();
 
-  const hash = await page.evaluate(async selector => {
+  const hash = await page.evaluate(async (selector) => {
     const $img = document.querySelector<HTMLImageElement>(
       `#Tk_${selector}_layout img`
     );
@@ -145,7 +145,7 @@ async function handleKeypad(
     }
 
     // Wait until image loads
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       $img.addEventListener("load", resolve);
     });
 
@@ -159,7 +159,7 @@ async function handleKeypad(
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hash = hashArray
-      .map(byte => byte.toString(16).padStart(2, "0"))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
       .join("");
 
     return hash.substring(0, 6);
@@ -197,16 +197,16 @@ async function fetchResult(page: puppeteer.Page): Promise<Result> {
       [];
 
     const [name, account, balance, withdrawable, branch] = [
-      ...new Array(5)
+      ...new Array(5),
     ].map((_, index) => meta[index]?.textContent || "");
 
     const transactions: Transaction[] = Array.from(
       document.querySelectorAll("table.tbl-type-1 tbody tr")
     )
-      .map(el =>
-        Array.from(el.children).map(el => el?.textContent?.trim() || "")
+      .map((el) =>
+        Array.from(el.children).map((el) => el?.textContent?.trim() || "")
       )
-      .filter(el => el.length === 7) // filter rows without data
+      .filter((el) => el.length === 7) // filter rows without data
       .map(([timestamp, type, name, withdrawal, deposit, balance, branch]) => ({
         timestamp,
         type,
@@ -214,7 +214,7 @@ async function fetchResult(page: puppeteer.Page): Promise<Result> {
         name: replaceFullWidth(name),
         withdrawal: convertNumber(withdrawal),
         deposit: convertNumber(deposit),
-        balance: convertNumber(balance)
+        balance: convertNumber(balance),
       }));
 
     return {
@@ -223,7 +223,7 @@ async function fetchResult(page: puppeteer.Page): Promise<Result> {
       branch,
       transactions,
       balance: convertNumber(balance.replace(" 원", "")),
-      withdrawable: convertNumber(withdrawable.replace(" 원", ""))
+      withdrawable: convertNumber(withdrawable.replace(" 원", "")),
     };
   });
 
