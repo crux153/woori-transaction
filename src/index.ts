@@ -170,7 +170,7 @@ async function handleKeypad(
     throw new Error("Failed to find keypad image");
   }
 
-  const coords = await keypad(hash, key);
+  const coords = keypad(hash, key);
   const box = await $img.boundingBox();
 
   if (!box) {

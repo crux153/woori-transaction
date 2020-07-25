@@ -15,7 +15,10 @@ const coordinates = [
 
 const hashes = ["713ff4", "d064da", "74d4c4", "8747a0", "8b22c9", "c01fd0"];
 
-export default async function keypad(hash: string, password: string) {
+export default function keypad(
+  hash: string,
+  password: string
+): { x: number; y: number }[] {
   if (!/^[0-9]+$/.test(password)) {
     throw new Error("Password should be digits");
   }
