@@ -36,7 +36,10 @@ export default async function woori(
   const range = parseRange(rangeStr);
 
   // Launch puppeteer
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    defaultViewport: { width: 1080, height: 1080 },
+  });
+
   const page = await browser.newPage();
 
   page.on("dialog", (dialog) => {

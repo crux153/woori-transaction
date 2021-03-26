@@ -6,6 +6,14 @@ import { table } from "table";
 
 import transaction from ".";
 
+interface Options {
+  account?: string;
+  password?: string;
+  birthday?: string;
+  range?: string;
+  json?: boolean;
+}
+
 commander
   .option("-a --account <value>", "bank account number")
   .option("-p --password <value>", "bank account password")
@@ -14,22 +22,23 @@ commander
   .option("-j --json", "output json")
   .parse(process.argv);
 
-if (!commander.account || !commander.password || !commander.birthday) {
-  commander.help();
-}
-
 main();
 
 async function main() {
   try {
+    const options: Options = commander.opts();
+    if (!options.account || !options.password || !options.birthday) {
+      commander.help();
+    }
+
     const result = await transaction(
-      commander.account,
-      commander.password,
-      commander.birthday,
-      commander.range
+      options.account,
+      options.password,
+      options.birthday,
+      options.range
     );
 
-    if (commander.json) {
+    if (options.json) {
       process.stdout.write(JSON.stringify(result, null, 2) + "\n");
       return;
     }
