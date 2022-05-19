@@ -1,23 +1,25 @@
 #!/usr/bin/env node
 
-import commander from "commander";
+import { Command } from "commander";
 import chalk from "chalk";
 import { table } from "table";
 
 import transaction from ".";
 
 interface Options {
-  account?: string;
-  password?: string;
-  birthday?: string;
+  account: string;
+  password: string;
+  birthday: string;
   range?: string;
   json?: boolean;
 }
 
-commander
-  .option("-a --account <value>", "bank account number")
-  .option("-p --password <value>", "bank account password")
-  .option("-b --birthday <value>", "birthday of registered user")
+const program = new Command();
+
+program
+  .requiredOption("-a --account <value>", "bank account number")
+  .requiredOption("-p --password <value>", "bank account password")
+  .requiredOption("-b --birthday <value>", "birthday of registered user")
   .option("-r --range <value>", "date range to fetch [format: 1D, 15D, 1W, 1M]")
   .option("-j --json", "output json")
   .parse(process.argv);
@@ -26,10 +28,7 @@ main();
 
 async function main() {
   try {
-    const options: Options = commander.opts();
-    if (!options.account || !options.password || !options.birthday) {
-      commander.help();
-    }
+    const options = program.opts<Options>();
 
     const result = await transaction(
       options.account,
@@ -51,15 +50,9 @@ async function main() {
 
     const output = table(
       [
-        [
-          "일시",
-          "적용",
-          "기재내용",
-          "출금",
-          "입금",
-          "잔액",
-          "취급점",
-        ].map((c) => chalk.cyan(c)),
+        ["일시", "적용", "기재내용", "출금", "입금", "잔액", "취급점"].map(
+          (c) => chalk.cyan(c)
+        ),
         ...result.transactions.map(
           ({ timestamp, type, name, withdrawal, deposit, balance, branch }) => [
             timestamp,
