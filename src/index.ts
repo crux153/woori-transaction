@@ -97,7 +97,7 @@ export default async function woori(
       "INQ_END_DT",
       "INQ_STA_DT",
       range.unit,
-      range.amount
+      String(range.amount)
     );
     window.doSubmit();
   }, range);
