@@ -1,0 +1,37 @@
+{
+  "name": "woori-transaction",
+  "version": "3.0.0",
+  "description": "Inquiry Woori Bank transactions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/crux153/woori-transaction.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.20.0"
+  },
+  "files": [
+    "lib"
+  ],
+  "keywords": [
+    "woori",
+    "bank"
+  ],
+  "bugs": {
+    "url": "https://github.com/crux153/woori-transaction/issues"
+  },
+  "author": "Crux <crux153@users.noreply.github.com>",
+  "bin": "lib/cli.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "npm run --silent clean && tsc",
+    "clean": "rimraf lib"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^9.4.1",
+    "puppeteer": "^18.2.1",
+    "table": "^6.8.0"
+  }
+}

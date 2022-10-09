@@ -1,0 +1,7 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/woori-transaction-core" },
+    { "path": "packages/woori-transaction" }
+  ]
+}

@@ -1,42 +1,17 @@
 {
-  "name": "woori-transaction",
-  "version": "2.2.0",
-  "description": "Inquiry Woori Bank transactions",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/crux153/woori-transaction.git"
-  },
-  "license": "MIT",
+  "name": "woori-transaction-workspace",
+  "private": true,
   "engines": {
-    "node": ">=12.20.0"
+    "node": ">=12.20.0",
+    "npm": ">=8"
   },
-  "files": [
-    "lib"
-  ],
-  "keywords": [
-    "woori",
-    "bank"
-  ],
-  "bugs": {
-    "url": "https://github.com/crux153/woori-transaction/issues"
-  },
-  "author": "Crux <crux153@users.noreply.github.com>",
-  "bin": "lib/cli.js",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
   "scripts": {
-    "build": "npm run --silent clean && tsc",
-    "clean": "rimraf lib",
-    "lint": "eslint \"src/**/*.ts\"",
-    "prettier": "prettier --write \"src/**/*.ts\"",
+    "build": "npm run --silent clean && tsc -b tsconfig.build.json",
+    "clean": "rimraf \"packages/**/lib\" \"packages/**/*.tsbuildinfo\"",
+    "lint": "eslint \"packages/*/src/**/*.ts\"",
+    "prettier": "prettier --write \"packages/*/src/**/*.ts\"",
     "prepare": "husky install",
     "pre-commit": "lint-staged"
-  },
-  "dependencies": {
-    "chalk": "^4.1.2",
-    "commander": "^9.4.1",
-    "puppeteer": "^18.2.1",
-    "table": "^6.8.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.39.0",
@@ -51,5 +26,9 @@
   },
   "lint-staged": {
     "*.ts": "prettier --write"
-  }
+  },
+  "workspaces": [
+    "packages/woori-transaction-core",
+    "packages/woori-transaction"
+  ]
 }
