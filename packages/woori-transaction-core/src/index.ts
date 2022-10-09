@@ -1,4 +1,6 @@
-import puppeteer from "puppeteer";
+import type puppeteer from "puppeteer";
+import type puppeteerCore from "puppeteer-core";
+
 import keypad from "./keypad";
 
 const WOORI_URL = "https://spib.wooribank.com/spd/Dream?withyou=CMSPD0010";
@@ -27,6 +29,7 @@ export interface Transaction {
 }
 
 export default async function woori(
+  browser: puppeteer.Browser | puppeteerCore.Browser,
   account: string,
   password: string,
   birthday: string,
@@ -35,12 +38,7 @@ export default async function woori(
   // Parse range
   const range = parseRange(rangeStr);
 
-  // Launch puppeteer
-  const browser = await puppeteer.launch({
-    defaultViewport: { width: 1080, height: 1080 },
-  });
-
-  const page = await browser.newPage();
+  const page = (await browser.newPage()) as puppeteerCore.Page;
 
   page.on("dialog", (dialog) => {
     const message = dialog.message();
@@ -127,7 +125,7 @@ function parseRange(range: string) {
 }
 
 async function handleKeypad(
-  page: puppeteer.Page,
+  page: puppeteerCore.Page,
   selector: string,
   key: string
 ) {
@@ -185,7 +183,7 @@ async function handleKeypad(
   }
 }
 
-async function fetchResult(page: puppeteer.Page): Promise<Result> {
+async function fetchResult(page: puppeteerCore.Page): Promise<Result> {
   const result = await page.evaluate(() => {
     const convertNumber = (number: string) =>
       parseInt(number.replace(/,/g, ""), 10) || 0;
