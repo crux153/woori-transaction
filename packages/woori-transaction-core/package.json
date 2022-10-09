@@ -28,6 +28,7 @@
     "clean": "rimraf lib"
   },
   "devDependencies": {
+    "puppeteer": "^18.2.1",
     "puppeteer-core": "^18.2.1"
   }
 }

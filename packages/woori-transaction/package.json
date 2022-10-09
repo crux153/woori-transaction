@@ -32,6 +32,7 @@
     "chalk": "^4.1.2",
     "commander": "^9.4.1",
     "puppeteer": "^18.2.1",
-    "table": "^6.8.0"
+    "table": "^6.8.0",
+    "woori-transaction-core": "^3.0.0"
   }
 }
