@@ -9,6 +9,10 @@ class DialogError extends Error {}
 class PageError extends Error {}
 class RangeError extends Error {}
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type IsAny<T> = unknown extends T ? (T extends {} ? T : never) : never;
+type NotAny<T> = T extends IsAny<T> ? never : T;
+
 export interface Result {
   name: string;
   account: string;
@@ -29,7 +33,7 @@ export interface Transaction {
 }
 
 export default async function woori(
-  browser: puppeteer.Browser | puppeteerCore.Browser,
+  browser: NotAny<puppeteer.Browser> | NotAny<puppeteerCore.Browser>,
   account: string,
   password: string,
   birthday: string,

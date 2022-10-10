@@ -1,6 +1,6 @@
 {
   "name": "woori-transaction-core",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Inquiry Woori Bank transactions",
   "repository": {
     "type": "git",
