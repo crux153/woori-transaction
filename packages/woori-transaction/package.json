@@ -1,6 +1,6 @@
 {
   "name": "woori-transaction",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Inquiry Woori Bank transactions",
   "repository": {
     "type": "git",
@@ -33,6 +33,6 @@
     "commander": "^9.4.1",
     "puppeteer": "^18.2.1",
     "table": "^6.8.0",
-    "woori-transaction-core": "^3.0.4"
+    "woori-transaction-core": "^3.0.5"
   }
 }

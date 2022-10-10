@@ -6,7 +6,8 @@
     "npm": ">=8"
   },
   "scripts": {
-    "build": "npm run --silent clean && tsc -b tsconfig.build.json",
+    "build": "npm run --silent clean && npm run --silent build:cp && tsc -b tsconfig.build.json",
+    "build:cp": "mkdir -p packages/woori-transaction-core/lib && cp packages/woori-transaction-core/src/puppeteer.d.ts packages/woori-transaction-core/lib/puppeteer.d.ts",
     "clean": "rimraf \"packages/**/lib\" \"packages/**/*.tsbuildinfo\"",
     "lint": "eslint \"packages/*/src/**/*.ts\"",
     "prettier": "prettier --write \"packages/*/src/**/*.ts\"",

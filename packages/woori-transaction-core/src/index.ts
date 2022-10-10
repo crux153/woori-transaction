@@ -1,6 +1,4 @@
-import type puppeteer from "puppeteer";
-import type puppeteerCore from "puppeteer-core";
-
+import type puppeteer from "./puppeteer";
 import keypad from "./keypad";
 
 const WOORI_URL = "https://spib.wooribank.com/spd/Dream?withyou=CMSPD0010";
@@ -8,10 +6,6 @@ const WOORI_URL = "https://spib.wooribank.com/spd/Dream?withyou=CMSPD0010";
 class DialogError extends Error {}
 class PageError extends Error {}
 class RangeError extends Error {}
-
-// eslint-disable-next-line @typescript-eslint/ban-types
-type IsAny<T> = unknown extends T ? (T extends {} ? T : never) : never;
-type NotAny<T> = T extends IsAny<T> ? never : T;
 
 export interface Result {
   name: string;
@@ -33,7 +27,7 @@ export interface Transaction {
 }
 
 export default async function woori(
-  browser: NotAny<puppeteer.Browser> | NotAny<puppeteerCore.Browser>,
+  browser: puppeteer.Browser,
   account: string,
   password: string,
   birthday: string,
@@ -42,7 +36,7 @@ export default async function woori(
   // Parse range
   const range = parseRange(rangeStr);
 
-  const page = (await browser.newPage()) as puppeteerCore.Page;
+  const page = (await browser.newPage()) as puppeteer.Page;
 
   page.on("dialog", (dialog) => {
     const message = dialog.message();
@@ -129,7 +123,7 @@ function parseRange(range: string) {
 }
 
 async function handleKeypad(
-  page: puppeteerCore.Page,
+  page: puppeteer.Page,
   selector: string,
   key: string
 ) {
@@ -187,7 +181,7 @@ async function handleKeypad(
   }
 }
 
-async function fetchResult(page: puppeteerCore.Page): Promise<Result> {
+async function fetchResult(page: puppeteer.Page): Promise<Result> {
   const result = await page.evaluate(() => {
     const convertNumber = (number: string) =>
       parseInt(number.replace(/,/g, ""), 10) || 0;
