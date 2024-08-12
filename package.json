@@ -2,7 +2,7 @@
   "name": "woori-transaction-workspace",
   "private": true,
   "engines": {
-    "node": ">=12.20.0",
+    "node": ">=18",
     "npm": ">=8"
   },
   "scripts": {
@@ -15,15 +15,15 @@
     "pre-commit": "lint-staged"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.39.0",
-    "@typescript-eslint/parser": "^5.39.0",
-    "eslint": "^8.24.0",
-    "eslint-config-prettier": "^8.5.0",
-    "husky": "^8.0.1",
-    "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.8.4"
+    "@typescript-eslint/eslint-plugin": "^8.0.1",
+    "@typescript-eslint/parser": "^8.0.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.8",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.5.4"
   },
   "lint-staged": {
     "*.ts": "prettier --write"

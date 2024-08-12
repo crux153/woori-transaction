@@ -1,6 +1,6 @@
 {
   "name": "woori-transaction-core",
-  "version": "3.0.5",
+  "version": "4.0.0",
   "description": "Inquiry Woori Bank transactions",
   "repository": {
     "type": "git",
@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "engines": {
-    "node": ">=12.20.0"
+    "node": ">=18"
   },
   "files": [
     "lib"
@@ -28,7 +28,7 @@
     "clean": "rimraf lib"
   },
   "devDependencies": {
-    "puppeteer": "^18.2.1",
-    "puppeteer-core": "^18.2.1"
+    "puppeteer": "^23.0.2",
+    "puppeteer-core": "^23.0.2"
   }
 }
