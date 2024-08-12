@@ -1,4 +1,4 @@
-import type puppeteer from "./puppeteer";
+import type { Browser, Page } from "./puppeteer";
 import keypad from "./keypad";
 
 const WOORI_URL = "https://spib.wooribank.com/spd/Dream?withyou=CMSPD0010";
@@ -27,16 +27,16 @@ export interface Transaction {
 }
 
 export default async function woori(
-  browser: puppeteer.Browser,
+  browser: Browser,
   account: string,
   password: string,
   birthday: string,
-  rangeStr: string = "1W"
+  rangeStr: string = "1W",
 ): Promise<Result> {
   // Parse range
   const range = parseRange(rangeStr);
 
-  const page = (await browser.newPage()) as puppeteer.Page;
+  const page = (await browser.newPage()) as Page;
 
   page.on("dialog", (dialog) => {
     const message = dialog.message();
@@ -71,7 +71,7 @@ export default async function woori(
   // Check error message on page
   const errorMessage = await page.evaluate(() => {
     const $error = document.querySelector(
-      "#error-area-TopLayer .error-area .mb10"
+      "#error-area-TopLayer .error-area .mb10",
     );
     if (!$error) {
       return null;
@@ -93,7 +93,7 @@ export default async function woori(
       "INQ_END_DT",
       "INQ_STA_DT",
       range.unit,
-      String(range.amount)
+      String(range.amount),
     );
     window.doSubmit();
   }, range);
@@ -122,11 +122,7 @@ function parseRange(range: string) {
   return { amount, unit };
 }
 
-async function handleKeypad(
-  page: puppeteer.Page,
-  selector: string,
-  key: string
-) {
+async function handleKeypad(page: Page, selector: string, key: string) {
   const $el = await page.$("#" + selector);
   if (!$el) {
     throw new Error("Failed to find input element");
@@ -136,7 +132,7 @@ async function handleKeypad(
 
   const hash = await page.evaluate(async (selector) => {
     const $img = document.querySelector<HTMLImageElement>(
-      `#Tk_${selector}_layout img`
+      `#Tk_${selector}_layout img`,
     );
 
     if (!$img) {
@@ -181,14 +177,14 @@ async function handleKeypad(
   }
 }
 
-async function fetchResult(page: puppeteer.Page): Promise<Result> {
+async function fetchResult(page: Page): Promise<Result> {
   const result = await page.evaluate(() => {
     const convertNumber = (number: string) =>
       parseInt(number.replace(/,/g, ""), 10) || 0;
 
     const replaceFullWidth = (str: string) =>
       str.replace(/[\uFF01-\uFF5E]/g, (char: string) =>
-        String.fromCharCode(char.charCodeAt(0) - 0xfee0)
+        String.fromCharCode(char.charCodeAt(0) - 0xfee0),
       );
 
     const meta =
@@ -200,10 +196,10 @@ async function fetchResult(page: puppeteer.Page): Promise<Result> {
     ].map((_, index) => meta[index]?.textContent || "");
 
     const transactions: Transaction[] = Array.from(
-      document.querySelectorAll("table.tbl-type-1 tbody tr")
+      document.querySelectorAll("table.tbl-type-1 tbody tr"),
     )
       .map((el) =>
-        Array.from(el.children).map((el) => el?.textContent?.trim() || "")
+        Array.from(el.children).map((el) => el?.textContent?.trim() || ""),
       )
       .filter((el) => el.length === 7) // filter rows without data
       .map(([timestamp, type, name, withdrawal, deposit, balance, branch]) => ({
